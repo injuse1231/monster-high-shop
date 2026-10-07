@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monster High Shop — коллекционные куклы</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=12">
+    <link rel="icon" href="{% static 'monstricon.png' %}" type="image/png">
+</head>
+<!-- Якорь «Главная» теперь на самом body: страница уедет в абсолютный верх -->
+<body id="top">
+
+    <header>
+        <div class="container">
+            <div class="header-wrapper">
+                <a href="/" class="logo">
+                    <img src="{% static 'monstricon.png' %}" alt="MH" class="logo-icon">
+                    <span>Monster High</span>
+                </a>
+                <nav class="nav-links">
+                    <a href="#catalog">Каталог</a>
+                    <a href="#about">О нас</a>
+                    <!-- Корзина-значок с красным счётчиком товаров -->
+                    <a href="{% url 'cart_detail' %}" class="cart-btn" title="Корзина">
+                        <svg class="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="21" r="1.6"></circle>
+                            <circle cx="19" cy="21" r="1.6"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                        <span class="cart-count">{{ cart|length }}</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message message-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <main class="container">
+        <h1>Коллекция кукол</h1>
+
+        <!-- Якорь «Каталог» на сетке карточек -->
+        <div id="catalog" class="products-grid">
+            {% for product in products %}
+            <div class="product-card">
+                <div class="card-image-wrapper">
+                    {% if product.photo %}
+                        <!-- Ленивая загрузка: картинки подгружаются по мере прокрутки — сайт быстрее -->
+                        <img src="{{ product.photo.url }}" alt="{{ product.name }}" class="product-photo" loading="lazy" decoding="async">
+                    {% else %}
+                        <div style="color: #aaa;">Нет фото</div>
+                    {% endif %}
+                </div>
+                <div class="card-content">
+                    <h3>{{ product.name }}</h3>
+                    <div class="price-row">
+                        <div class="price">{{ product.price_formatted }} ₽</div>
+                    </div>
+
+                    <!-- Кнопка «В корзину»: рабочая форма -->
+                    <form action="{% url 'cart_add' product.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="add-to-cart">В корзину</button>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+            <p style="grid-column: 1/-1; text-align: center; color: #fff; padding: 50px;">
+                Товаров пока нет в наличии. Добавьте их в админке!
+            </p>
+            {% endfor %}
+        </div>
+    </main>
+
+    <!-- Блок «О нас»: к нему скроллит кнопка «О нас» -->
+    <section id="about" class="about-banner">
+        <div class="container">
+            <h2 class="section-title">О нас</h2>
+            <p class="about-text">
+                Мы — магазин коллекционных кукол Monster High. Наша миссия — дарить радость фанатам по всей стране. В нашем ассортименте только оригинальные куклы в полной комплектации. Мы тщательно проверяем каждую куклу перед отправкой, бережно упаковываем и гарантируем сохранность при доставке.
+            </p>
+        </div>
+    </section>
+
+    <!-- Блок контактов -->
+    <section class="info-section">
+        <div class="container">
+            <h2 class="section-title">Контакты</h2>
+
+            <div class="info-grid">
+                <!-- Отзывы -->
+                <div class="reviews-block">
+                    <h3>Отзывы покупателей</h3>
+
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="avatar">А</div>
+                            <div>
+                                <strong>Анна К.</strong>
+                                <span class="rating">★★★★★</span>
+                                <small>12 октября 2024</small>
+                            </div>
+                        </div>
+                        <p>«Лучшая кукла в моей коллекции! Качество на высоте, упаковка надёжная. Пришла в идеальном состоянии, без сколов и царапин. Отдельное спасибо за быструю доставку!»</p>
+                    </div>
+
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="avatar">Д</div>
+                            <div>
+                                <strong>Дмитрий С.</strong>
+                                <span class="rating">★★★★☆</span>
+                                <small>8 октября 2024</small>
+                            </div>
+                        </div>
+                        <p>«Заказывал на день рождения дочери. Кукла пришла в срок, комплектация полная. Немного переживал насчёт цвета, но вживую выглядит даже лучше, чем на фото!»</p>
+                    </div>
+                </div>
+
+                <!-- Контакты -->
+                <div class="contacts-block">
+                    <h3>Связь с нами</h3>
+
+                    <div class="contact-details">
+                        <p><strong>💬 Telegram:</strong><br>Самый быстрый способ — написать боту или нам напрямую. Ответим на вопросы о наличии, цене и доставке.</p>
+
+                        <p><strong>🌐 ВКонтакте:</strong><br>В нашей группе — новости пополнений, фото кукол и общение с другими коллекционерами.</p>
+
+                        <p><strong>🕐 Режим работы:</strong><br>Отвечаем ежедневно, обычно в течение пары часов.</p>
+                    </div>
+
+                    <div class="social-links">
+                        <a href="https://t.me/monster_high5bot" class="social-btn" title="Написать в Telegram" target="_blank" rel="noopener">Telegram</a>
+                        <a href="https://vk.ru/club30619581" class="social-btn" title="Наш паблик ВКонтакте" target="_blank" rel="noopener">ВКонтакте</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Monster High Shop. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <!-- Лайтбокс: просмотр фото куклы поверх страницы -->
+    <div id="lightbox" class="lightbox">
+        <img id="lightbox-img" src="" alt="Просмотр фото">
+    </div>
+
+    <script>
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        document.querySelectorAll('.product-photo').forEach(img => {
+            img.addEventListener('click', () => {
+                lightboxImg.src = img.src;
+                lightbox.classList.add('open');
+            });
+        });
+
+        lightbox.addEventListener('click', () => {
+            lightbox.classList.remove('open');
+        });
+    </script>
+
+</body>
+</html>
